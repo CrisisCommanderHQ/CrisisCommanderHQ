@@ -1,0 +1,212 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+
+const scenarios = {
+  start: {
+    text: "As the newly appointed Crisis Commander, you receive an alert about an approaching Category 3 hurricane. What's your first move?",
+    choices: [
+      { text: "Call an emergency meeting", next: "meeting" },
+      { text: "Issue an immediate public warning", next: "warning" }
+    ]
+  },
+  meeting: {
+    text: "During the meeting, your team suggests either focusing on evacuation or strengthening infrastructure. Which do you prioritize?",
+    choices: [
+      { text: "Prioritize evacuation plans", next: "evacuation" },
+      { text: "Focus on infrastructure", next: "infrastructure" }
+    ]
+  },
+  warning: {
+    text: "The public is now aware, but panic buying has started. How do you address this?",
+    choices: [
+      { text: "Implement rationing", next: "rationing" },
+      { text: "Increase supply chain efficiency", next: "supplyChain" }
+    ]
+  },
+  evacuation: {
+    text: "Evacuation is underway, but traffic jams are forming. What's your next step?",
+    choices: [
+      { text: "Convert incoming lanes to outgoing", next: "trafficManagement" },
+      { text: "Prioritize public transportation", next: "publicTransport" }
+    ]
+  },
+  infrastructure: {
+    text: "While reinforcing key buildings, you receive news of potential flooding. How do you respond?",
+    choices: [
+      { text: "Deploy sandbags and pumps", next: "floodControl" },
+      { text: "Focus on electrical grid protection", next: "powerGrid" }
+    ]
+  },
+  rationing: {
+    text: "Rationing has calmed panic buying, but some areas report shortages. What's your solution?",
+    choices: [
+      { text: "Organize community sharing programs", next: "communitySharing" },
+      { text: "Redirect supplies from less affected areas", next: "supplyRedirection" }
+    ]
+  },
+  supplyChain: {
+    text: "Supply chains are more efficient, but a key highway is now blocked by an accident. How do you proceed?",
+    choices: [
+      { text: "Establish alternative routes", next: "alternativeRoutes" },
+      { text: "Airlift critical supplies", next: "airlift" }
+    ]
+  },
+  trafficManagement: {
+    text: "Traffic is moving better, but coastal areas are still in danger. What's your priority now?",
+    choices: [
+      { text: "Door-to-door checks in high-risk areas", next: "doorChecks" },
+      { text: "Set up more emergency shelters", next: "emergencyShelters" }
+    ]
+  },
+  publicTransport: {
+    text: "Public transport is helping, but many are still stranded. How do you assist them?",
+    choices: [
+      { text: "Deploy national guard for evacuation assistance", next: "nationalGuard" },
+      { text: "Establish pickup points for shared transportation", next: "pickupPoints" }
+    ]
+  },
+  floodControl: {
+    text: "Flood defenses are holding, but a hospital's basement is flooding. What's your call?",
+    choices: [
+      { text: "Evacuate the hospital", next: "hospitalEvacuation" },
+      { text: "Send a specialized pump team", next: "pumpTeam" }
+    ]
+  },
+  powerGrid: {
+    text: "The electrical grid is secure, but now there's a city-wide blackout. How do you respond?",
+    choices: [
+      { text: "Prioritize power restoration to critical facilities", next: "criticalPower" },
+      { text: "Distribute emergency generators", next: "emergencyGenerators" }
+    ]
+  },
+  communitySharing: {
+    text: "Community sharing is working well, but some areas are not participating. How do you address this?",
+    choices: [
+      { text: "Launch a city-wide awareness campaign", next: "awarenessCampaign" },
+      { text: "Implement a reward system for active communities", next: "rewardSystem" }
+    ]
+  },
+  supplyRedirection: {
+    text: "Supplies are being redirected, but this has caused tension between neighborhoods. What's your next move?",
+    choices: [
+      { text: "Hold town hall meetings to explain the situation", next: "townHalls" },
+      { text: "Implement a fair rotation system for supplies", next: "rotationSystem" }
+    ]
+  },
+  endGame: {
+    text: "The hurricane has passed. Your leadership has guided the city through the crisis. How will you approach the recovery phase?",
+    choices: [
+      { text: "Focus on rapid infrastructure repair", next: "restart" },
+      { text: "Prioritize community mental health and support", next: "restart" }
+    ]
+  },
+  restart: {
+    text: "Thank you for playing Crisis Commander. Would you like to face a new crisis?",
+    choices: [
+      { text: "Start a new game", next: "start" },
+      { text: "End the session", next: "end" }
+    ]
+  }
+};
+
+const CrisisCommander = () => {
+  const [currentScenario, setCurrentScenario] = useState('start');
+  const [stats, setStats] = useState({ safety: 50, resources: 50, morale: 50 });
+  const [history, setHistory] = useState([]);
+
+  const handleChoice = (choice) => {
+    setHistory([...history, { scenario: currentScenario, choice: choice.text }]);
+    setCurrentScenario(choice.next);
+    
+    // Simulate stat changes based on choices
+    setStats(prevStats => ({
+      safety: Math.max(0, Math.min(100, prevStats.safety + Math.floor(Math.random() * 21) - 10)),
+      resources: Math.max(0, Math.min(100, prevStats.resources + Math.floor(Math.random() * 21) - 10)),
+      morale: Math.max(0, Math.min(100, prevStats.morale + Math.floor(Math.random() * 21) - 10))
+    }));
+  };
+
+  const resetGame = () => {
+    setCurrentScenario('start');
+    setStats({ safety: 50, resources: 50, morale: 50 });
+    setHistory([]);
+  };
+
+  const scenario = scenarios[currentScenario];
+
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-4">Crisis Commander</h1>
+      
+      <div className="grid grid-cols-3 gap-4 mb-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Safety</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Progress value={stats.safety} className="w-full" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Resources</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Progress value={stats.resources} className="w-full" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Morale</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Progress value={stats.morale} className="w-full" />
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>{scenario.text}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-4">
+            {scenario.choices.map((choice, index) => (
+              <Button key={index} onClick={() => handleChoice(choice)}>
+                {choice.text}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {currentScenario === 'end' && (
+        <Card>
+          <CardContent>
+            <h2 className="text-2xl font-bold mb-4">Game Over</h2>
+            <Button onClick={resetGame}>Play Again</Button>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Decision History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul>
+            {history.map((item, index) => (
+              <li key={index}>
+                <strong>{item.scenario}:</strong> {item.choice}
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default CrisisCommander;
